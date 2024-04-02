@@ -1,0 +1,91 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { CreateDeviceForm } from "../components/FormNewDevice";
+import { Devices } from "../components/Devices";
+
+const cookie = Astro.cookies.get("access_token");
+
+// Si el usuario no ha iniciado sesión, redirígelos a la página de inicio de sesión
+if (!cookie) {
+    return Astro.redirect("/login");
+}
+const jwt = cookie?.value;
+const response = await fetch("http://127.0.0.1:8000/dashboard", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jwt }),
+});
+const json = await response.json();
+const devices = json;
+console.log(devices);
+---
+
+<Layout title="Dashboard">
+    <main>
+        <div class="container mx-auto p-10">
+            <button
+                id="openPopup"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-10"
+            >
+                Crear nou Aparell
+            </button>
+            <Devices devices={devices} client:only />
+        </div>
+        <!-- Botón para abrir el pop-up -->
+
+        <!-- Pop-up -->
+        <div
+            id="popupContainer"
+            class="fixed top-0 left-0 right-0 bottom-0 flex z-50 items-center justify-center hidden"
+        >
+            <div class="popup bg-blue-50 p-6 rounded shadow-lg">
+                <div class="text-end">
+                    <button class="content-end" id="closePopup">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="icon icon-tabler icon-tabler-x"
+                            width="32"
+                            height="32"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="#2c3e50"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"
+                            ></path>
+                            <path d="M18 6l-12 12"></path>
+                            <path d="M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <h2 class="text-lg font-semibold mb-4 text-black">
+                    Nou dispositiu
+                </h2>
+                <CreateDeviceForm client:visible />
+            </div>
+        </div>
+    </main>
+</Layout>
+<script>
+    // Función para abrir el pop-up
+    function openPopup() {
+        document.getElementById("popupContainer")?.classList.remove("hidden");
+        console.log("hola");
+    }
+
+    // Función para cerrar el pop-up
+    function closePopup() {
+        document.getElementById("popupContainer")?.classList.add("hidden");
+    }
+
+    // Event listener para abrir el pop-up cuando se haga clic en el botón
+    document.getElementById("openPopup")?.addEventListener("click", openPopup);
+    document.getElementById("btnMapAdd")?.addEventListener("click", openPopup);
+
+    document
+        .getElementById("closePopup")
+        ?.addEventListener("click", closePopup);
+</script>

@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { LoginForm } from '../components/FormLogin';
+
+
+---
+
+<Layout title="Login AgroConnect">
+	<main>
+        <section class="container py-12 mx-auto">
+            <LoginForm client:visible />
+        </section>
+	</main>
+</Layout>
